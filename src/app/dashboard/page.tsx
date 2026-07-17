@@ -1,192 +1,239 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-// Mock Data
-const KPIs = [
-  { label: "Monthly Recurring Revenue", value: "$124,500", delta: "+12.5%", trend: "up" },
-  { label: "Active Customers", value: "1,492", delta: "+4.2%", trend: "up" },
-  { label: "Churn Rate", value: "2.1%", delta: "-0.4%", trend: "up" }, // down churn is good (up trend visually for positive)
-  { label: "Customer Acquisition Cost", value: "$412", delta: "+8.1%", trend: "down" }
-];
-
-const ProgressData = [
-  { label: "Enterprise Tier Goal", current: 75 },
-  { label: "Q3 Sales Target", current: 42 },
-  { label: "Infrastructure Migration", current: 90 },
-];
-
-const Alerts = [
-  { title: "High API Latency Detected", severity: "danger", time: "2m ago" },
-  { title: "Payment Gateway Deprecation", severity: "warning", time: "4h ago" },
-];
+// Fictional Company: AeroFlow Freight
+// Persona: VP of Operations
 
 export default function DashboardPage() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const [hoveredNode, setHoveredNode] = useState<{x: number, y: number} | null>(null);
+  const [activeKpi, setActiveKpi] = useState<number>(0);
+
+  // Crosshair handler for the signature interaction
+  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>, maxW: number, maxH: number) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    if (x >= 0 && x <= maxW && y >= 0 && y <= maxH) {
+      setHoveredNode({ x, y });
+    } else {
+      setHoveredNode(null);
+    }
+  };
 
   return (
     <>
-      <div className="dash-header">
-        <h2>Executive Summary</h2>
-        <p>Real-time overview of your business metrics</p>
+      <div className="dash-header-row">
+        <div>
+          <h2 style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.02em' }}>Operations Overview</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginTop: '4px' }}>Real-time logistics performance for AeroFlow Hubs</p>
+        </div>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <select style={{ padding: '8px 16px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--surface)', fontSize: '13px', color: 'var(--text-secondary)' }}>
+            <option>Today, Oct 24</option>
+            <option>This Week</option>
+            <option>This Month</option>
+          </select>
+          <button className="btn btn-primary">Export Report</button>
+        </div>
       </div>
 
+      {/* KPI ROW */}
       <div className="kpi-grid">
-        {KPIs.map((kpi, i) => (
-          <div key={i} className="card kpi-card">
-            <div className="kpi-header">
-              <span className="kpi-label">{kpi.label}</span>
-              <div className="kpi-icon">
-                {/* SVG Icon Placeholder based on index */}
-                {i === 0 && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>}
-                {i === 1 && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>}
-                {i === 2 && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>}
-                {i === 3 && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>}
-              </div>
-            </div>
-            <div className="kpi-value data-text">{kpi.value}</div>
-            <div>
-              <span className={`kpi-delta ${kpi.trend}`}>
-                {kpi.trend === 'up' ? '↑' : '↓'} {kpi.delta}
-              </span>
-            </div>
-          </div>
-        ))}
+        <div 
+          className="card kpi-card" 
+          style={{ cursor: 'pointer', border: activeKpi === 0 ? '2px solid var(--accent-primary)' : '1px solid var(--border)' }}
+          onClick={() => setActiveKpi(0)}
+        >
+          <span className="kpi-label">Active Dispatches</span>
+          <div className="kpi-value">1,492</div>
+          <div><span className="kpi-delta up">↑ 4.2%</span> <span style={{fontSize: '11px', color: 'var(--text-muted)'}}>vs yesterday</span></div>
+        </div>
+        <div 
+          className="card kpi-card"
+          style={{ cursor: 'pointer', border: activeKpi === 1 ? '2px solid var(--accent-primary)' : '1px solid var(--border)' }}
+          onClick={() => setActiveKpi(1)}
+        >
+          <span className="kpi-label">On-Time Delivery (SLA)</span>
+          <div className="kpi-value">94.8%</div>
+          <div><span className="kpi-delta down">↓ 1.1%</span> <span style={{fontSize: '11px', color: 'var(--text-muted)'}}>vs yesterday</span></div>
+        </div>
+        <div 
+          className="card kpi-card"
+          style={{ cursor: 'pointer', border: activeKpi === 2 ? '2px solid var(--accent-primary)' : '1px solid var(--border)' }}
+          onClick={() => setActiveKpi(2)}
+        >
+          <span className="kpi-label">Idle Fleet Capacity</span>
+          <div className="kpi-value">8.4%</div>
+          <div><span className="kpi-delta up">↑ 2.0%</span> <span style={{fontSize: '11px', color: 'var(--text-muted)'}}>vs yesterday</span></div>
+        </div>
+        <div 
+          className="card kpi-card"
+          style={{ cursor: 'pointer', border: activeKpi === 3 ? '2px solid var(--accent-primary)' : '1px solid var(--border)' }}
+          onClick={() => setActiveKpi(3)}
+        >
+          <span className="kpi-label">Est. Daily Margin</span>
+          <div className="kpi-value">$24,500</div>
+          <div><span className="kpi-delta up">↑ 12.5%</span> <span style={{fontSize: '11px', color: 'var(--text-muted)'}}>vs yesterday</span></div>
+        </div>
       </div>
 
-      <div className="charts-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
-        <div className="card" style={{ gridColumn: 'span 2' }}>
-          <h3 className="card-title">Revenue Trend (30 Days)</h3>
-          <div style={{ height: '200px', width: '100%' }}>
-            <svg viewBox="0 0 400 150" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+      {/* CHARTS GRID 1: LINE & BAR */}
+      <div className="charts-grid">
+        <div className="card chart-area">
+          <h3 className="card-title">Delivery SLA Trend (12 Hours)</h3>
+          <div style={{ height: '240px', width: '100%', position: 'relative' }}>
+            <svg 
+              viewBox="0 0 600 200" 
+              style={{ width: '100%', height: '100%', overflow: 'visible' }}
+              onMouseMove={(e) => handleMouseMove(e, 600, 200)}
+              onMouseLeave={() => setHoveredNode(null)}
+            >
+              {/* Grid */}
               <g className="chart-grid">
-                <line x1="0" y1="0" x2="400" y2="0" />
-                <line x1="0" y1="37.5" x2="400" y2="37.5" />
-                <line x1="0" y1="75" x2="400" y2="75" />
-                <line x1="0" y1="112.5" x2="400" y2="112.5" />
-                <line x1="0" y1="150" x2="400" y2="150" />
+                <line x1="0" y1="0" x2="600" y2="0" />
+                <line x1="0" y1="50" x2="600" y2="50" />
+                <line x1="0" y1="100" x2="600" y2="100" />
+                <line x1="0" y1="150" x2="600" y2="150" />
+                <line x1="0" y1="200" x2="600" y2="200" />
               </g>
               <g className="chart-axis">
-                <text x="-5" y="150" textAnchor="end">0k</text>
-                <text x="-5" y="75" textAnchor="end">50k</text>
-                <text x="-5" y="0" textAnchor="end">100k</text>
+                <text x="-10" y="200" textAnchor="end">80%</text>
+                <text x="-10" y="100" textAnchor="end">90%</text>
+                <text x="-10" y="0" textAnchor="end">100%</text>
               </g>
+
+              {/* Data Line */}
               <path 
-                d="M0 120 C 50 110, 100 130, 150 90 S 250 110, 300 60 S 350 40, 400 20" 
+                d="M 0 60 C 100 80, 200 40, 300 100 S 400 140, 500 90 S 550 50, 600 20" 
                 fill="none" 
-                stroke="var(--accent)" 
-                strokeWidth="3"
-                strokeLinecap="round"
-                className={mounted ? "draw-line" : ""}
-                style={{ strokeDasharray: 1000, strokeDashoffset: mounted ? 0 : 1000, transition: 'stroke-dashoffset 1.5s ease-out' }}
+                stroke="var(--accent-primary)" 
+                strokeWidth="2"
               />
-              {/* Data points */}
-              <circle cx="150" cy="90" r="4" fill="var(--surface)" stroke="var(--accent)" strokeWidth="2" />
-              <circle cx="300" cy="60" r="4" fill="var(--surface)" stroke="var(--accent)" strokeWidth="2" />
-              <circle cx="400" cy="20" r="4" fill="var(--surface)" stroke="var(--accent)" strokeWidth="2" />
               
-              {/* Soft area under line */}
+              {/* Area Fill */}
               <path 
-                d="M0 150 L 0 120 C 50 110, 100 130, 150 90 S 250 110, 300 60 S 350 40, 400 20 L 400 150 Z" 
-                fill="url(#gradient-area)" 
-                opacity="0.3"
+                d="M 0 200 L 0 60 C 100 80, 200 40, 300 100 S 400 140, 500 90 S 550 50, 600 20 L 600 200 Z" 
+                fill="url(#line-grad)" 
               />
               <defs>
-                <linearGradient id="gradient-area" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="var(--accent)" />
-                  <stop offset="100%" stopColor="var(--surface)" stopOpacity="0" />
+                <linearGradient id="line-grad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--accent-primary)" stopOpacity="0.15" />
+                  <stop offset="100%" stopColor="var(--accent-primary)" stopOpacity="0" />
                 </linearGradient>
               </defs>
-            </svg>
-          </div>
-        </div>
 
-        <div className="card">
-          <h3 className="card-title">User Segments</h3>
-          <div style={{ height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-            <svg viewBox="0 0 120 120" style={{ width: '150px', height: '150px' }}>
-              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" strokeWidth="12" />
-              {mounted && (
+              {/* Signature Crosshair */}
+              {hoveredNode && (
                 <>
-                  <circle cx="60" cy="60" r="50" fill="none" stroke="var(--accent)" strokeWidth="12" strokeDasharray="314" strokeDashoffset="80" strokeLinecap="round" style={{ transition: 'stroke-dashoffset 1s ease-out', transformOrigin: 'center', transform: 'rotate(-90deg)' }} />
-                  <circle cx="60" cy="60" r="50" fill="none" stroke="var(--warning)" strokeWidth="12" strokeDasharray="314" strokeDashoffset="280" strokeLinecap="round" style={{ transition: 'stroke-dashoffset 1s ease-out 0.2s', transformOrigin: 'center', transform: 'rotate(150deg)' }} />
+                  <line x1={hoveredNode.x} y1="0" x2={hoveredNode.x} y2="200" className="crosshair-line" style={{opacity: 1}} />
+                  <line x1="0" y1={hoveredNode.y} x2="600" y2={hoveredNode.y} className="crosshair-line" style={{opacity: 1}} />
+                  <circle cx={hoveredNode.x} cy={hoveredNode.y} r="4" fill="var(--surface)" stroke="var(--accent-primary)" strokeWidth="2" style={{pointerEvents: 'none'}} />
                 </>
               )}
             </svg>
-            <div style={{ position: 'absolute', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '24px', fontWeight: 700, fontFamily: 'var(--font-display)' }}>84%</span>
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Pro Users</span>
-            </div>
           </div>
         </div>
 
         <div className="card">
-          <h3 className="card-title">Weekly Signups</h3>
-          <div style={{ height: '200px', width: '100%' }}>
-            <svg viewBox="0 0 400 150" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+          <h3 className="card-title">Volume by Region</h3>
+          <div style={{ height: '240px', width: '100%' }}>
+            <svg viewBox="0 0 300 200" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
               <g className="chart-grid">
-                <line x1="0" y1="0" x2="400" y2="0" />
-                <line x1="0" y1="50" x2="400" y2="50" />
-                <line x1="0" y1="100" x2="400" y2="100" />
-                <line x1="0" y1="150" x2="400" y2="150" />
+                <line x1="0" y1="0" x2="300" y2="0" />
+                <line x1="0" y1="100" x2="300" y2="100" />
+                <line x1="0" y1="200" x2="300" y2="200" />
               </g>
               <g className="chart-axis">
-                <text x="-5" y="150" textAnchor="end">0</text>
-                <text x="-5" y="75" textAnchor="end">100</text>
-                <text x="-5" y="0" textAnchor="end">200</text>
+                <text x="50" y="220" textAnchor="middle">East</text>
+                <text x="150" y="220" textAnchor="middle">Mid</text>
+                <text x="250" y="220" textAnchor="middle">West</text>
               </g>
-              {[120, 80, 150, 90, 110, 140, 60].map((val, i) => (
-                <rect 
-                  key={i}
-                  x={i * 55 + 20} 
-                  y={150 - (val / 200) * 150} 
-                  width="35" 
-                  height={(val / 200) * 150} 
-                  fill="var(--accent)" 
-                  rx="4"
-                  style={{ transformOrigin: 'bottom', transform: mounted ? 'scaleY(1)' : 'scaleY(0)', transition: `transform 0.5s ease-out ${i * 0.1}s` }}
-                />
-              ))}
+              
+              <rect x="30" y="40" width="40" height="160" fill="var(--accent-primary)" rx="4" />
+              <rect x="130" y="90" width="40" height="110" fill="var(--accent-primary)" rx="4" opacity="0.8" />
+              <rect x="230" y="140" width="40" height="60" fill="var(--accent-primary)" rx="4" opacity="0.6" />
             </svg>
           </div>
         </div>
       </div>
 
-      <div className="charts-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+      {/* CHARTS GRID 2: DONUT, PROGRESS, FEED/ALERTS */}
+      <div className="charts-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+        
         <div className="card">
-          <h3 className="card-title">Key Milestones</h3>
-          <div className="progress-list">
-            {ProgressData.map((item, i) => (
-              <div key={i}>
-                <div className="progress-item-header">
-                  <span>{item.label}</span>
-                  <span className="data-text" style={{ color: 'var(--text-muted)' }}>{item.current}%</span>
-                </div>
-                <div className="progress-track">
-                  <div className="progress-fill" style={{ width: mounted ? `${item.current}%` : '0%', background: 'var(--accent)' }}></div>
-                </div>
-              </div>
-            ))}
+          <h3 className="card-title">Hub Capacity Utilization</h3>
+          <div style={{ height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+            <svg viewBox="0 0 120 120" style={{ width: '140px', height: '140px' }}>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border-light)" strokeWidth="12" />
+              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--accent-primary)" strokeWidth="12" strokeDasharray="314" strokeDashoffset="47" strokeLinecap="round" style={{ transformOrigin: 'center', transform: 'rotate(-90deg)' }} />
+              <circle cx="60" cy="60" r="34" fill="none" stroke="var(--border-light)" strokeWidth="8" />
+              <circle cx="60" cy="60" r="34" fill="none" stroke="var(--warning)" strokeWidth="8" strokeDasharray="213" strokeDashoffset="120" strokeLinecap="round" style={{ transformOrigin: 'center', transform: 'rotate(-90deg)' }} />
+            </svg>
+            <div style={{ position: 'absolute', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '20px', fontWeight: 600, fontFamily: 'var(--font-display)' }}>85%</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '16px', fontSize: '12px' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><div style={{width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-primary)'}}></div> Core Routes</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><div style={{width: 8, height: 8, borderRadius: '50%', background: 'var(--warning)'}}></div> Overflow</span>
           </div>
         </div>
 
         <div className="card">
-          <h3 className="card-title">Active Alerts</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {Alerts.map((alert, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '16px', borderBottom: i < Alerts.length - 1 ? '1px solid var(--border)' : 'none' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <span style={{ fontSize: '14px', fontWeight: 500 }}>{alert.title}</span>
-                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{alert.time}</span>
-                </div>
-                <div className={`alert-tag ${alert.severity}`}>
-                  {alert.severity.toUpperCase()}
-                </div>
-              </div>
-            ))}
+          <h3 className="card-title">Top Performing Routes</h3>
+          <div className="progress-list">
+            <div>
+              <div className="progress-item-header"><span>ORD → EWR</span> <span className="data-text">98%</span></div>
+              <div className="progress-track"><div className="progress-fill" style={{ width: '98%' }}></div></div>
+            </div>
+            <div>
+              <div className="progress-item-header"><span>LAX → DEN</span> <span className="data-text">94%</span></div>
+              <div className="progress-track"><div className="progress-fill" style={{ width: '94%' }}></div></div>
+            </div>
+            <div>
+              <div className="progress-item-header"><span>DFW → ATL</span> <span className="data-text">88%</span></div>
+              <div className="progress-track"><div className="progress-fill" style={{ width: '88%' }}></div></div>
+            </div>
+            <div>
+              <div className="progress-item-header"><span>MIA → JFK</span> <span className="data-text">76%</span></div>
+              <div className="progress-track"><div className="progress-fill" style={{ width: '76%', background: 'var(--warning)' }}></div></div>
+            </div>
           </div>
         </div>
+
+        <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '0 0 24px 0' }}>
+            <h3 className="card-title" style={{ margin: 0 }}>Active Issues</h3>
+            <span style={{ fontSize: '12px', color: 'var(--accent-primary)', fontWeight: 500, cursor: 'pointer' }}>View All</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
+            
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--danger)', marginTop: '6px' }}></div>
+              <div>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '4px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 500 }}>Weather Delay</span>
+                  <span className="tag danger">High</span>
+                </div>
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Snowstorm impacting I-80. 14 trucks stalled near Cheyenne.</p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--warning)', marginTop: '6px' }}></div>
+              <div>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '4px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 500 }}>Maintenance</span>
+                  <span className="tag warning">Med</span>
+                </div>
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>3 vehicles flagged for preventative brake inspection in ATL hub.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </>
   );
