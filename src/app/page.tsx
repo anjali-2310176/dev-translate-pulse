@@ -1,65 +1,50 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+export default function LandingPage() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <div className="landing-canvas">
+      {/* Background blobs and geometric rings */}
+      <div className="mesh-bg">
+        <div className="blob blob-1"></div>
+        <div className="blob blob-2"></div>
+        <div className="blob blob-3"></div>
+        
+        <div className="geo-ring ring-1"></div>
+        <div className="geo-ring ring-2"></div>
+        
+        <div className="dot-grid"></div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="landing-nav">
+        <Link href="#" className="nav-link">About</Link>
+        <Link href="#" className="nav-link">Platform</Link>
+        <Link href="/" className="nav-pill" style={{ background: 'var(--text)', color: 'var(--bg)' }}>Home</Link>
+        <Link href="#" className="nav-link">Pricing</Link>
+        <Link href="#" className="nav-link">Contact</Link>
+      </nav>
+
+      {/* Hero Content */}
+      <main className="landing-content">
+        <h1 className="hero-title">DATA,</h1>
+        <h2 className="hero-subtitle">WITHOUT THE CODE</h2>
+        
+        <p className="hero-text">
+          Assemble live business metrics, charts, and reports instantly. Connect your sources, build your visual narrative, and share immediately. The clarity of a data team, the speed of no-code.
+        </p>
+
+        {/* Pill CTA from reference */}
+        <Link href="/dashboard" className="btn btn-outline" style={{ padding: '8px 8px 8px 32px' }}>
+          <span>Login</span>
+          <span style={{ margin: '0 16px', opacity: 0.3 }}>|</span>
+          <span style={{ fontWeight: 600 }}>Start building →</span>
+        </Link>
       </main>
     </div>
   );
