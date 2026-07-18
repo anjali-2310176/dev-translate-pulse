@@ -13,6 +13,7 @@ export default function TranslatePage() {
   const [input, setInput] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [history, setHistory] = useState<{ tech: string; business: string }[]>([]);
 
   const handleTranslate = async () => {
@@ -35,6 +36,12 @@ export default function TranslatePage() {
       setResult("Translation service unavailable. Please check your API key.");
     }
     setLoading(false);
+  };
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(result);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -79,12 +86,28 @@ export default function TranslatePage() {
             <button className="btn btn-primary" onClick={handleTranslate} disabled={loading || !input.trim()}>
               {loading ? "Translating..." : "Translate to Business Value"}
             </button>
-            <button className="btn btn-secondary" onClick={() => setInput("")} disabled={!input}>
+            <button className="btn btn-secondary" onClick={() => { setInput(""); setResult(""); }} disabled={!input && !result}>
               Clear
             </button>
           </div>
 
-          {result && (
+          {/* Loading Skeleton */}
+          {loading && (
+            <div style={{
+              padding: "20px",
+              background: "var(--bg)",
+              borderRadius: "var(--radius-md)",
+              border: "1px solid var(--border)",
+            }}>
+              <div style={{ height: '12px', width: '40%', background: 'var(--border)', borderRadius: '4px', marginBottom: '16px', animation: 'skeleton-pulse 1.5s infinite ease-in-out' }}></div>
+              <div style={{ height: '14px', width: '100%', background: 'var(--border)', borderRadius: '4px', marginBottom: '10px', animation: 'skeleton-pulse 1.5s infinite ease-in-out', animationDelay: '0.2s' }}></div>
+              <div style={{ height: '14px', width: '85%', background: 'var(--border)', borderRadius: '4px', marginBottom: '10px', animation: 'skeleton-pulse 1.5s infinite ease-in-out', animationDelay: '0.4s' }}></div>
+              <div style={{ height: '14px', width: '60%', background: 'var(--border)', borderRadius: '4px', animation: 'skeleton-pulse 1.5s infinite ease-in-out', animationDelay: '0.6s' }}></div>
+            </div>
+          )}
+
+          {/* Result */}
+          {result && !loading && (
             <div style={{
               padding: "20px",
               background: "var(--accent-soft)",
@@ -100,12 +123,34 @@ export default function TranslatePage() {
                 <div style={{ fontSize: "11px", fontWeight: 700, color: "var(--accent-primary)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                   Business Translation
                 </div>
-                <button 
-                  onClick={() => navigator.clipboard.writeText(result)}
-                  style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: 600 }}
+                <button
+                  onClick={handleCopy}
+                  style={{
+                    background: copied ? 'var(--accent-primary)' : 'none',
+                    border: copied ? 'none' : '1px solid var(--accent-primary)',
+                    color: copied ? 'white' : 'var(--accent-primary)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    padding: '4px 10px',
+                    borderRadius: 'var(--radius-sm)',
+                    transition: 'all 0.2s',
+                  }}
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                  Copy
+                  {copied ? (
+                    <>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                      Copy
+                    </>
+                  )}
                 </button>
               </div>
               {result}

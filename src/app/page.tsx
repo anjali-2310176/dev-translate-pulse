@@ -9,17 +9,6 @@ export default function LandingPage() {
 
   return (
     <div className="landing-theme">
-      {/* Background treatment: Large soft-focus blurred blobs */}
-      <div className="landing-blobs">
-        <div className="blob-shape blob-peach"></div>
-        <div className="blob-shape blob-coral"></div>
-        {mounted && <div className="blob-shape blob-mint"></div>}
-
-        {/* Thin outlined circles overlapping blobs for depth */}
-        <div className="geo-outline outline-1"></div>
-        <div className="geo-outline outline-2"></div>
-      </div>
-
       {/* Optional floating element */}
       <div className="floating-action">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

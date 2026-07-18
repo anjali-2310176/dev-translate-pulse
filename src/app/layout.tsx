@@ -15,7 +15,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <div className="landing-blobs">
+          <div className="blob-shape blob-peach"></div>
+          <div className="blob-shape blob-coral"></div>
+          <div className="blob-shape blob-mint"></div>
+          <div className="geo-outline outline-1"></div>
+          <div className="geo-outline outline-2"></div>
+        </div>
+        
+        {/* We need a wrapper with position relative and z-index 1 so the content sits above the fixed blobs */}
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          {children}
+        </div>
       </body>
     </html>
   );

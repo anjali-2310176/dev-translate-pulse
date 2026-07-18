@@ -1,11 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@500;600;700&display=swap');
 
 :root {
-  --bg: #F8FAFC;
+  --bg: #FFFFFF;
   --surface: #FFFFFF;
   
-  --accent-primary: #0F52BA; /* Sapphire Blue */
-  --accent-soft: #E0E7FF;
+  --accent-primary: #E87A5D; /* Coral/Peach */
+  --accent-soft: #FFF5F2;
   
   --success: #059669;
   --success-bg: #ECFDF5;
@@ -85,7 +85,7 @@ h1, h2, h3, h4, h5, h6 {
 .btn-primary {
   background: var(--accent-primary);
   color: white;
-  box-shadow: 0 2px 8px rgba(15, 82, 186, 0.2);
+  box-shadow: 0 2px 8px rgba(232, 122, 93, 0.2);
 }
 
 .btn-primary:hover {
@@ -411,7 +411,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .landing-blobs {
-  position: absolute;
+  position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
@@ -559,6 +559,28 @@ h1, h2, h3, h4, h5, h6 {
   cursor: pointer;
   color: white;
   box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+/* ANIMATIONS */
+@keyframes skeleton-pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* RESPONSIVE */

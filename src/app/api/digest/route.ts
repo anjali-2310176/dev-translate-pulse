@@ -19,30 +19,37 @@ Rules:
 
 export async function POST(req: NextRequest) {
   try {
-    const { projectData } = await req.json();
+    const { includeJira, includeGitHub } = await req.json();
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey || apiKey === "your_gemini_api_key_here") {
-      return NextResponse.json({ error: "Gemini API key not configured." }, { status: 500 });
+      return NextResponse.json({ error: "Gemini API key not configured. Please update .env.local" }, { status: 500 });
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-    const context = projectData || `Sprint 14 highlights:
-- Merged 23 PRs this week
+    let context = `Sprint 14 highlights:\n`;
+    
+    if (includeGitHub) {
+      context += `- Merged 23 PRs this week
 - Fixed race condition in Redis cache hydration (PR #402)
 - Completed JWT token rotation implementation
 - Migrated 3 microservices to pgBouncer connection pooling
-- Started Stripe v3 payment gateway integration (60% done)
-- Mobile app: push notification service refactored
-- Database migration to PostgreSQL 16 completed
-- CI/CD pipeline migrated from Jenkins to GitHub Actions
-Blockers:
+- CI/CD pipeline migrated from Jenkins to GitHub Actions\n`;
+    }
+
+    if (includeJira) {
+      context += `Blockers:
 - Stripe sandbox environment down for maintenance (est. 2 days)
 - Push notification vendor changed their API spec
 Team velocity: 45 story points (up from 38 last sprint)
 Sprint goal completion: 78%`;
+    }
+
+    if (!includeGitHub && !includeJira) {
+      context = "No data sources were selected for this digest.";
+    }
 
     const result = await model.generateContent([
       { text: SYSTEM_PROMPT },
