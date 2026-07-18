@@ -420,7 +420,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* MINIMAL BLOB LANDING THEME */
 .landing-theme {
-  background: #FFFFFF;
+  background: transparent;
   color: #111111;
   min-height: 100vh;
   position: relative;
