@@ -53,10 +53,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         <div style={{ marginTop: 'auto', padding: '16px 8px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--accent-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '12px' }}>SF</div>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--accent-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '12px' }}>AS</div>
             <div>
-              <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)' }}>Sarah F.</div>
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>VP Operations</div>
+              <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)' }}>ANJALI S.</div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Lead Developer</div>
             </div>
           </div>
         </div>
