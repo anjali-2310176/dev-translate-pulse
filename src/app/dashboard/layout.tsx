@@ -24,14 +24,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="dash-layout">
       <aside className="sidebar">
-        <div className="sidebar-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-            <div style={{ width: 14, height: 14, background: 'var(--accent-primary)', borderRadius: '3px' }}></div>
-            <span style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--accent-primary)' }}>Pulse</span>
+        <Link href="/" style={{ textDecoration: 'none' }}>
+          <div className="sidebar-header" style={{ cursor: 'pointer' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+              <div style={{ width: 14, height: 14, background: 'var(--accent-primary)', borderRadius: '3px' }}></div>
+              <span style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--accent-primary)' }}>Dev-Translate</span>
+            </div>
+            <h1 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>DevTranslate</h1>
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Workspace Intelligence</p>
           </div>
-          <h1 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>DevTranslate</h1>
-          <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Workspace Intelligence</p>
-        </div>
+        </Link>
         
         <nav className="sidebar-nav">
           {navItems.map(group => (

@@ -33,13 +33,13 @@ export default function LandingPage() {
         </div>
 
         <div className="landing-link-active">
-          Pulse
+          Dev-Translate
         </div>
       </nav>
 
       {/* Hero */}
       <main className="landing-hero">
-        <h1 className="landing-headline">PULSE</h1>
+        <h1 className="landing-headline">DEV-TRANSLATE</h1>
         <h2 className="landing-subhead">Data without the code.</h2>
         
         <p className="landing-body">
