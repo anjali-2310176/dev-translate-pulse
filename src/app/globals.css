@@ -438,13 +438,13 @@ h1, h2, h3, h4, h5, h6 {
 .blob-shape {
   position: absolute;
   border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.5;
+  filter: blur(90px);
+  opacity: 0.8;
 }
 
-.blob-peach { background: #F5D9A8; width: 600px; height: 600px; top: -100px; left: -100px; }
-.blob-coral { background: #F4A6A6; width: 800px; height: 800px; bottom: -200px; right: -200px; }
-.blob-mint { background: #8FE3C0; width: 400px; height: 400px; top: 40%; left: 60%; opacity: 0.3; }
+.blob-mint { background: #66D5A5; width: 600px; height: 600px; bottom: -200px; left: -200px; }
+.blob-peach { background: #F5C677; width: 500px; height: 500px; top: 20%; left: 30%; opacity: 0.7; }
+.blob-coral { background: #F06E6E; width: 700px; height: 700px; top: 10%; right: -150px; }
 
 .geo-outline {
   position: absolute;
@@ -452,8 +452,8 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid #E5E7EB;
   pointer-events: none;
 }
-.outline-1 { width: 500px; height: 500px; bottom: 10%; right: 5%; }
-.outline-2 { width: 300px; height: 300px; top: 20%; left: 10%; }
+.outline-1 { width: 450px; height: 450px; bottom: -100px; left: -150px; }
+.outline-2 { width: 500px; height: 500px; top: 15%; right: -150px; }
 
 .landing-nav-bar {
   position: fixed;
