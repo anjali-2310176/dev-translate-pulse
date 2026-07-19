@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const EXAMPLE_INPUTS = [
   "Merged PR #512: Migrated user sessions from cookie-based auth to stateless JWT with Redis-backed refresh tokens",
@@ -15,6 +15,29 @@ export default function TranslatePage() {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [history, setHistory] = useState<{ tech: string; business: string }[]>([]);
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const res = await fetch("/api/translate");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.history && data.history.length > 0) {
+            setHistory(data.history.map((item: any) => ({
+              tech: item.originalText,
+              business: item.translatedText
+            })));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch translation history");
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+    fetchHistory();
+  }, []);
 
   const handleTranslate = async () => {
     if (!input.trim()) return;

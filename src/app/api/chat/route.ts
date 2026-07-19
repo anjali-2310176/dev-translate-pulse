@@ -1,5 +1,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
+import { prisma } from "@/lib/prisma";
 
 const SYSTEM_PROMPT = `You are DevTranslate Q&A Bot — a friendly, knowledgeable assistant that helps non-technical business stakeholders understand what the engineering team is doing.
 
@@ -20,9 +23,29 @@ Rules:
 - Use analogies when helpful.
 - If you don't know something, say so honestly.`;
 
+export async function GET() {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ sessions: [] });
+    }
+
+    const sessions = await prisma.chatSession.findMany({
+      where: { userId: session.user.id },
+      orderBy: { updatedAt: "desc" },
+      take: 10,
+    });
+
+    return NextResponse.json({ sessions });
+  } catch (error: unknown) {
+    console.error("Chat GET error:", error);
+    return NextResponse.json({ error: "Failed to fetch chat sessions" }, { status: 500 });
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const { message, history } = await req.json();
+    const { message, history, sessionId } = await req.json();
 
     if (!message?.trim()) {
       return NextResponse.json({ error: "Please provide a message." }, { status: 400 });
@@ -55,7 +78,34 @@ export async function POST(req: NextRequest) {
     const result = await chat.sendMessage(message);
     const reply = result.response.text();
 
-    return NextResponse.json({ reply });
+    // Persist to Supabase if the user is authenticated
+    const authSession = await getServerSession(authOptions);
+    let finalSessionId = sessionId;
+    
+    if (authSession?.user?.id) {
+      const updatedHistory = [...(history || []), { role: "user", text: message }, { role: "model", text: reply }];
+      
+      if (sessionId) {
+        // Update existing session
+        await prisma.chatSession.update({
+          where: { id: sessionId },
+          data: { history: JSON.stringify(updatedHistory) },
+        });
+      } else {
+        // Create new session
+        const title = message.length > 30 ? message.substring(0, 30) + "..." : message;
+        const newSession = await prisma.chatSession.create({
+          data: {
+            userId: authSession.user.id,
+            title,
+            history: JSON.stringify(updatedHistory),
+          },
+        });
+        finalSessionId = newSession.id;
+      }
+    }
+
+    return NextResponse.json({ reply, sessionId: finalSessionId });
   } catch (error: unknown) {
     console.error("Chat API error:", error);
     const message = error instanceof Error ? error.message : "Chat failed";

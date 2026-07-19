@@ -15,6 +15,7 @@ export default function ChatPage() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -24,6 +25,33 @@ export default function ChatPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    const loadSessions = async () => {
+      try {
+        const res = await fetch("/api/chat");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.sessions && data.sessions.length > 0) {
+            const latestSession = data.sessions[0];
+            setSessionId(latestSession.id);
+            try {
+              const parsedHistory = JSON.parse(latestSession.history);
+              setMessages(parsedHistory.map((item: any) => ({
+                role: item.role === "user" ? "user" : "bot",
+                content: item.text
+              })));
+            } catch (e) {
+              console.error("Failed to parse history");
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch chat sessions");
+      }
+    };
+    loadSessions();
+  }, []);
 
   const handleSend = async (text?: string) => {
     const userMsg = (text || input).trim();
@@ -42,9 +70,10 @@ export default function ChatPage() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMsg, history }),
+        body: JSON.stringify({ message: userMsg, history, sessionId }),
       });
       const data = await res.json();
+      if (data.sessionId) setSessionId(data.sessionId);
       setMessages((prev) => [...prev, { role: "bot", content: data.reply || data.error }]);
     } catch {
       setMessages((prev) => [
@@ -64,7 +93,10 @@ export default function ChatPage() {
         </div>
         <button
           className="btn btn-secondary"
-          onClick={() => setMessages([{ role: "bot", content: "Session cleared. How can I help you understand the engineering work?" }])}
+          onClick={() => {
+            setMessages([{ role: "bot", content: "Session cleared. How can I help you understand the engineering work?" }]);
+            setSessionId(null);
+          }}
           style={{ fontSize: '13px' }}
         >
           Clear Chat
