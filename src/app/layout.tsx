@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
   title: "DevTranslate | Workspace Intelligence",
@@ -24,9 +25,11 @@ export default function RootLayout({
         </div>
         
         {/* We need a wrapper with position relative and z-index 1 so the content sits above the fixed blobs */}
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          {children}
-        </div>
+        <Providers>
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   );

@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   const navItems = [
     { section: "Analytics", items: [
@@ -51,13 +53,31 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
 
         <div style={{ marginTop: 'auto', padding: '16px 8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--accent-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '12px' }}>AS</div>
-            <div>
-              <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)' }}>ANJALI S.</div>
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Lead Developer</div>
+          {session ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                {session.user?.image ? (
+                  <img src={session.user.image} alt="User Avatar" style={{ width: 32, height: 32, borderRadius: '50%' }} />
+                ) : (
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--accent-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '12px' }}>
+                    {session.user?.name?.charAt(0) || 'U'}
+                  </div>
+                )}
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)' }}>{session.user?.name}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>GitHub Developer</div>
+                </div>
+              </div>
+              <button onClick={() => signOut()} style={{ fontSize: '12px', background: 'none', border: '1px solid var(--border)', padding: '6px', borderRadius: '4px', cursor: 'pointer', color: 'var(--text-muted)', width: '100%' }}>
+                Sign Out
+              </button>
             </div>
-          </div>
+          ) : (
+            <button onClick={() => signIn("github")} style={{ fontSize: '13px', fontWeight: 500, background: 'var(--text-primary)', color: 'var(--bg)', border: 'none', padding: '10px', borderRadius: '6px', cursor: 'pointer', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+              Sign In with GitHub
+            </button>
+          )}
         </div>
       </aside>
       
