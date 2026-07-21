@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700&display=swap');
 
 :root {
   --bg: #FFFFFF;
@@ -23,7 +23,7 @@
   --border: #E2E8F0;
   --border-light: #F1F5F9;
 
-  --font-display: 'Inter Tight', sans-serif;
+  --font-display: 'Outfit', sans-serif;
   --font-body: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
@@ -278,21 +278,22 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: var(--radius-md);
   padding: 24px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
-  transition: all var(--transition);
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow var(--transition), background var(--transition);
   position: relative;
   overflow: hidden;
 }
 
 .glass-card:hover {
-  box-shadow: 0 12px 32px -4px rgba(232, 122, 93, 0.15);
-  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 12px 40px -4px rgba(232, 122, 93, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.85);
+  transform: translateY(-2px);
 }
 
 .card-title {

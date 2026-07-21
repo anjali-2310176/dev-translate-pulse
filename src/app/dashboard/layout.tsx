@@ -24,13 +24,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="dash-layout">
       <aside className="sidebar">
         <Link href="/" style={{ textDecoration: 'none' }}>
-          <div className="sidebar-header" style={{ cursor: 'pointer' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-              <div style={{ width: 14, height: 14, background: 'var(--accent-primary)', borderRadius: '3px' }}></div>
-              <span style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--accent-primary)' }}>Dev-Translate</span>
+          <div className="sidebar-header" style={{ cursor: 'pointer', padding: '8px 4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ 
+                width: 32, 
+                height: 32, 
+                background: 'linear-gradient(135deg, var(--accent-primary) 0%, #D9654B 100%)', 
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 12px rgba(232, 122, 93, 0.3)'
+              }}>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                  <polyline points="16 6 12 2 8 6"></polyline>
+                  <line x1="12" y1="2" x2="12" y2="15"></line>
+                </svg>
+              </div>
+              <div>
+                <h1 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>DevTranslate</h1>
+                <p style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginTop: '2px' }}>Workspace Intelligence</p>
+              </div>
             </div>
-            <h1 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>DevTranslate</h1>
-            <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Workspace Intelligence</p>
           </div>
         </Link>
         
