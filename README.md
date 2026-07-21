@@ -7,7 +7,7 @@ DevTranslate is a next-generation workspace intelligence platform that bridges t
 - **Translation Engine**: Paste any highly technical engineering update (e.g., "Refactored the Redis caching layer to use read-through strategy with TTL-based invalidation") and instantly generate a business-friendly explanation of its impact.
 - **Sandbox Q&A**: An interactive chat interface powered by a contextual system prompt, allowing non-technical executives to ask questions about sprint blockers, architecture choices, and release timelines.
 - **Executive Dashboard**: A premium, glassmorphism-inspired UI displaying project health, sprint velocity, and technical debt distribution.
-- **GitHub Authentication**: Secure, stateless login using GitHub OAuth.
+- **Demo Authentication**: Secure, stateless login using a built-in Demo Credentials provider (no OAuth configuration required).
 - **Persistent History**: All translations and chat sessions are permanently saved to a Supabase PostgreSQL database for easy retrieval.
 
 ## 🛠️ Tech Stack
@@ -16,13 +16,13 @@ DevTranslate is a next-generation workspace intelligence platform that bridges t
 - **Styling**: Vanilla CSS with modern Glassmorphism aesthetics
 - **Database**: PostgreSQL (hosted on Supabase)
 - **ORM**: Prisma v7
-- **Authentication**: NextAuth.js (GitHub Provider + Prisma Adapter)
+- **Authentication**: NextAuth.js (Demo Credentials Provider + Prisma Adapter)
 - **AI Engine**: Google Gemini API (`gemini-flash-lite-latest`)
 - **Charting**: Recharts
 
 ## 💻 Local Development Setup
 
-To run this project locally, you will need a Supabase database, a GitHub OAuth App, and a Gemini API key.
+To run this project locally, you will need a Supabase database and a Gemini API key.
 
 1. **Clone the repository**
    ```bash
@@ -44,10 +44,6 @@ To run this project locally, you will need a Supabase database, a GitHub OAuth A
    # NextAuth Setup
    NEXTAUTH_URL="http://localhost:3000"
    NEXTAUTH_SECRET="your-random-secret-key"
-
-   # GitHub OAuth App Credentials
-   GITHUB_ID="your_github_client_id"
-   GITHUB_SECRET="your_github_client_secret"
 
    # Google Gemini API
    GEMINI_API_KEY="your_gemini_api_key"
