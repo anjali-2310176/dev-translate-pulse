@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell, PieChart, Pie } from 'recharts';
 
 // Recharts Custom Tooltip
@@ -17,25 +18,33 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-// Data sets
-const VELOCITY_DATA = [
-  { sprint: 'Sprint 38', completed: 85, planned: 90 },
-  { sprint: 'Sprint 39', completed: 92, planned: 85 },
-  { sprint: 'Sprint 40', completed: 78, planned: 95 },
-  { sprint: 'Sprint 41', completed: 95, planned: 90 },
-  { sprint: 'Sprint 42 (Current)', completed: 42, planned: 95 },
-];
-
-const TECH_DEBT_DATA = [
-  { name: 'Core API', value: 45 },
-  { name: 'Payment Gateway', value: 30 },
-  { name: 'Mobile Client', value: 15 },
-  { name: 'Auth Service', value: 10 },
-];
-
 const PIE_COLORS = ['var(--danger)', 'var(--warning)', 'var(--accent-primary)', 'var(--success)'];
 
 export default function ProjectHealthPage() {
+  const [velocityData, setVelocityData] = useState<any[]>([]);
+  const [techDebtData, setTechDebtData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [repoName, setRepoName] = useState('Loading...');
+
+  useEffect(() => {
+    async function fetchGitHubData() {
+      try {
+        const res = await fetch('/api/github/health');
+        if (res.ok) {
+          const data = await res.json();
+          setVelocityData(data.velocity);
+          setTechDebtData(data.techDebt);
+          setRepoName(data.repo);
+        }
+      } catch (error) {
+        console.error("Failed to fetch live github data", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchGitHubData();
+  }, []);
+
   return (
     <>
       <div className="dash-header-row">
@@ -79,7 +88,7 @@ export default function ProjectHealthPage() {
           <h3 className="card-title">Sprint Velocity (Points Delivered vs Planned)</h3>
           <div style={{ height: '300px', width: '100%' }}>
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={VELOCITY_DATA} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={velocityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorCompleted" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="var(--accent-primary)" stopOpacity={0.4}/>
@@ -108,11 +117,11 @@ export default function ProjectHealthPage() {
               <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--warning)', marginTop: '6px', flexShrink: 0 }}></div>
               <div>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '6px' }}>
-                  <span style={{ fontSize: '14px', fontWeight: 600 }}>Payment API Refactor</span>
-                  <span className="tag warning">Medium Risk</span>
+                  <span style={{ fontSize: '14px', fontWeight: 600 }}>GitHub Rate Limit</span>
+                  <span className="tag warning">Monitor</span>
                 </div>
                 <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
-                  The migration to the new Stripe endpoints is 3 days behind schedule due to unexpected legacy test failures.
+                  Live data is being fetched from {repoName}. Ensure PAT is configured to avoid rate limits.
                 </p>
               </div>
             </div>
@@ -121,11 +130,11 @@ export default function ProjectHealthPage() {
               <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--success)', marginTop: '6px', flexShrink: 0 }}></div>
               <div>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '6px' }}>
-                  <span style={{ fontSize: '14px', fontWeight: 600 }}>Auth0 Migration</span>
-                  <span className="tag" style={{ background: 'var(--success-bg)', color: 'var(--success)' }}>Resolved</span>
+                  <span style={{ fontSize: '14px', fontWeight: 600 }}>Live Integration</span>
+                  <span className="tag" style={{ background: 'var(--success-bg)', color: 'var(--success)' }}>Active</span>
                 </div>
                 <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
-                  Successfully rolled out to 100% of users. The login spike issue from last week is fully resolved.
+                  Successfully connected to the live GitHub API. Pulling real-time PR and commit metrics.
                 </p>
               </div>
             </div>
@@ -139,12 +148,12 @@ export default function ProjectHealthPage() {
       <div className="charts-grid" style={{ gridTemplateColumns: '1fr 2fr', marginTop: '24px' }}>
         
         <div className="glass-card">
-          <h3 className="card-title">Technical Debt Distribution</h3>
+          <h3 className="card-title">Code Churn by Subsystem</h3>
           <div style={{ height: '260px', width: '100%', position: 'relative' }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={TECH_DEBT_DATA}
+                  data={techDebtData}
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
@@ -153,7 +162,7 @@ export default function ProjectHealthPage() {
                   dataKey="value"
                   stroke="none"
                 >
-                  {TECH_DEBT_DATA.map((entry, index) => (
+                  {techDebtData.map((entry: any, index: number) => (
                     <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                   ))}
                 </Pie>
@@ -162,7 +171,7 @@ export default function ProjectHealthPage() {
             </ResponsiveContainer>
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '16px', marginTop: '8px', fontSize: '12px' }}>
-            {TECH_DEBT_DATA.map((item, i) => (
+            {techDebtData.map((item: any, i: number) => (
               <span key={item.name} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: PIE_COLORS[i] }}></div> {item.name}
               </span>
@@ -174,7 +183,7 @@ export default function ProjectHealthPage() {
           <h3 className="card-title">Code Churn by Repository</h3>
           <div style={{ height: '260px', width: '100%' }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={TECH_DEBT_DATA} layout="vertical" margin={{ top: 10, right: 30, left: 40, bottom: 0 }}>
+              <BarChart data={techDebtData} layout="vertical" margin={{ top: 10, right: 30, left: 40, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(0,0,0,0.05)" />
                 <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-muted)' }} />
                 <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-primary)', fontWeight: 500 }} />
