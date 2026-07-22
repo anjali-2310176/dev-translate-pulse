@@ -60,23 +60,25 @@ export default function ProjectHealthPage() {
       {/* TOP LEVEL STATUS */}
       <div className="glass-card" style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <div style={{ fontSize: '14px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Overall Project Status</div>
+          <div style={{ fontSize: '14px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Active Integration Target</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'var(--success)', boxShadow: '0 0 12px var(--success)' }}></div>
-            <h1 style={{ fontSize: '36px', fontWeight: 700, margin: 0, fontFamily: 'var(--font-display)' }}>On Track</h1>
+            <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: loading ? 'var(--warning)' : 'var(--success)', boxShadow: loading ? '0 0 12px var(--warning)' : '0 0 12px var(--success)' }}></div>
+            <h1 style={{ fontSize: '36px', fontWeight: 700, margin: 0, fontFamily: 'var(--font-display)' }}>{loading ? 'Fetching Data...' : repoName}</h1>
           </div>
           <p style={{ fontSize: '15px', color: 'var(--text-secondary)', marginTop: '8px', maxWidth: '600px', lineHeight: 1.5 }}>
-            The Q3 Mobile App Launch is currently tracking to schedule. Sprint velocity remains stable, though technical debt in the Payment Gateway is rising and requires monitoring.
+            {loading 
+              ? 'Analyzing recent Pull Requests and commit velocity via GitHub REST API...'
+              : `Live analysis of ${repoName} is complete. Velocity is calculated from recently merged Pull Requests, and Technical Debt is modeled based on active code churn across subsystems.`}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '24px', paddingRight: '24px' }}>
           <div>
-            <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Target Release</div>
-            <div style={{ fontSize: '20px', fontWeight: 600 }}>Oct 15, 2026</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Analyzed Commits</div>
+            <div style={{ fontSize: '20px', fontWeight: 600 }}>{loading ? '--' : 'Last 100'}</div>
           </div>
           <div>
-            <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Confidence Score</div>
-            <div style={{ fontSize: '20px', fontWeight: 600, color: 'var(--success)' }}>92%</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>API Status</div>
+            <div style={{ fontSize: '20px', fontWeight: 600, color: loading ? 'var(--warning)' : 'var(--success)' }}>{loading ? 'Connecting' : 'Healthy'}</div>
           </div>
         </div>
       </div>
