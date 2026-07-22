@@ -4,24 +4,16 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 
-const SYSTEM_PROMPT = `You are DevTranslate Q&A Bot — a friendly, knowledgeable assistant that helps non-technical business stakeholders understand what the engineering team is doing.
+const SYSTEM_PROMPT = `You are DevTranslate Q&A Bot — an elite AI assistant that helps non-technical business stakeholders understand what the engineering team is doing.
 
-You have access to the following project context:
-- Project: "Apex Commerce Platform" — a next-generation e-commerce platform
-- Current Sprint: Sprint 14 — "Payment & Security Hardening"
-- Active team: 6 engineers, 1 tech lead, 1 DevOps engineer
-- Recent work: migrating user auth to JWT, upgrading payment gateway to Stripe v3, database migration to PostgreSQL 16, implementing real-time inventory tracking
-- Upcoming: Mobile app beta launch (target: 3 weeks), Analytics dashboard v2
-- Blockers: Payment gateway sandbox downtime (3rd party), push notification vendor API change
-- Tech stack: Next.js, Node.js, PostgreSQL, Redis, AWS, Docker
+You are currently analyzing the live Next.js repository using real-time GitHub data provided in your context window.
 
 Rules:
-- Always answer in plain, empathetic business language.
+- Always answer based ONLY on the Retrieved Real-Time Database Context provided below.
+- If the context mentions Pull Requests or commits, explain them in plain, empathetic business language.
 - Never use raw technical jargon — translate everything.
-- When explaining delays, be honest but frame them positively (what it protects, why it matters).
 - Keep answers concise (2-4 paragraphs max).
-- Use analogies when helpful.
-- If you don't know something, say so honestly.`;
+- If the retrieved context does not contain the answer, say "I don't have that specific information in my current live context." DO NOT make up an answer.`;
 
 export async function GET() {
   try {
@@ -60,7 +52,7 @@ export async function POST(req: NextRequest) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const embedModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
+    const embedModel = genAI.getGenerativeModel({ model: "gemini-embedding-2" });
     const chatModel = genAI.getGenerativeModel({ model: "gemini-flash-lite-latest" });
 
     // === TRUE RAG PIPELINE: Vector Similarity Search ===
@@ -68,14 +60,14 @@ export async function POST(req: NextRequest) {
     try {
       // 1. Generate an embedding of the user's question
       const embedResult = await embedModel.embedContent(message);
-      const queryEmbedding = embedResult.embedding.values;
+      const queryEmbeddingStr = JSON.stringify(embedResult.embedding.values);
 
       // 2. Perform Cosine Similarity Search (<=>) against pgvector database
       // We retrieve the top 3 most mathematically relevant GitHub PRs
       const relevantChunks = await prisma.$queryRaw<any[]>`
-        SELECT "prTitle", "author", "content", 1 - (embedding <=> ${queryEmbedding}::vector) as similarity
-        FROM "KnowledgeChunk"
-        WHERE 1 - (embedding <=> ${queryEmbedding}::vector) > 0.5
+        SELECT "prTitle", "author", "content", 1 - (embedding <=> ${queryEmbeddingStr}::vector) as similarity
+        FROM "KnowledgeVector"
+        WHERE 1 - (embedding <=> ${queryEmbeddingStr}::vector) > 0.2
         ORDER BY similarity DESC
         LIMIT 3
       `;

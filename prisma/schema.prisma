@@ -80,7 +80,7 @@ model ChatSession {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model KnowledgeChunk {
+model KnowledgeVector {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   
@@ -92,5 +92,5 @@ model KnowledgeChunk {
   
   // Content and Vector
   content   String   @db.Text
-  embedding Unsupported("vector(768)")?
+  embedding Unsupported("vector(3072)")?
 }
