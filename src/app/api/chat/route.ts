@@ -60,17 +60,48 @@ export async function POST(req: NextRequest) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-lite-latest" });
+    const embedModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
+    const chatModel = genAI.getGenerativeModel({ model: "gemini-flash-lite-latest" });
+
+    // === TRUE RAG PIPELINE: Vector Similarity Search ===
+    let ragContext = "";
+    try {
+      // 1. Generate an embedding of the user's question
+      const embedResult = await embedModel.embedContent(message);
+      const queryEmbedding = embedResult.embedding.values;
+
+      // 2. Perform Cosine Similarity Search (<=>) against pgvector database
+      // We retrieve the top 3 most mathematically relevant GitHub PRs
+      const relevantChunks = await prisma.$queryRaw<any[]>`
+        SELECT "prTitle", "author", "content", 1 - (embedding <=> ${queryEmbedding}::vector) as similarity
+        FROM "KnowledgeChunk"
+        WHERE 1 - (embedding <=> ${queryEmbedding}::vector) > 0.5
+        ORDER BY similarity DESC
+        LIMIT 3
+      `;
+
+      if (relevantChunks && relevantChunks.length > 0) {
+        ragContext = "\\n\\n### Retrieved Real-Time Database Context:\\n";
+        relevantChunks.forEach((chunk, index) => {
+          ragContext += `[PR ${index + 1} by ${chunk.author}]: ${chunk.content}\\n`;
+        });
+      } else {
+        ragContext = "\\n\\n### Retrieved Real-Time Database Context:\\n(No directly matching GitHub Pull Requests found in the vector database).";
+      }
+    } catch (ragError) {
+      console.error("RAG Pipeline failed, falling back to standard prompt:", ragError);
+    }
+    // =================================================
 
     const chatHistory = (history || []).map((msg: { role: string; text: string }) => ({
       role: msg.role === "user" ? "user" : "model",
       parts: [{ text: msg.text }],
     }));
 
-    const chat = model.startChat({
+    const chat = chatModel.startChat({
       history: [
-        { role: "user", parts: [{ text: "System instructions: " + SYSTEM_PROMPT }] },
-        { role: "model", parts: [{ text: "Understood! I'm ready to help explain your project's engineering work in clear, business-friendly language. Ask me anything!" }] },
+        { role: "user", parts: [{ text: "System instructions: " + SYSTEM_PROMPT + ragContext }] },
+        { role: "model", parts: [{ text: "Understood! I'm ready to help explain your project's engineering work in clear, business-friendly language based on the mathematical vector context provided. Ask me anything!" }] },
         ...chatHistory,
       ],
     });
